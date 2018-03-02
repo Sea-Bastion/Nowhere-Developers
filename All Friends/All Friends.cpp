@@ -6,11 +6,14 @@
 #include <cstdlib>
 using namespace std;
 
-bool eof;
+bool *Printed;
+vector<int> *data;
+
+vector<int> printData(vector<int> out);
 
 int main(){
 
-	while(!eof){
+	while(!cin.eof()){
 
 
 		char line[15];
@@ -20,20 +23,22 @@ int main(){
 		//getting n and setting up array
 		cin.getline(line, 15);
 		int n = stoi(line);
-		vector<int> data[n];
+		data = new vector<int>[n];
+		Printed = new bool[n];
 
 		//getting input from stdin
 		cin.getline(line, 15);
 		while (*line){
 			input.push_back(line);
-			if(cin.eof())
-				eof = true;
 			
-			else
-				cin.getline(line, 15);
+			cin.getline(line, 15);
 		}
 
-
+		// check if none
+		if(input.capacity() == 0){
+			cout << "NONE" << endl << endl;
+			continue;
+		}
 
 		//testing input
 		for (string i : input){
@@ -44,34 +49,53 @@ int main(){
 
 			//you can't be friends with yourself
 			if (a != b){
-				data[a-1].push_back(b);
-				data[b-1].push_back(a);
+				data[(a-1)].push_back(b);
+				data[(b-1)].push_back(a);
 			}
 		}
 
-	}
 
+		//output
+		for(int i = 1; i <= n; i++){
+			if(!Printed[(i-1)] && data[(i-1)].capacity() != 0){
+				
+				vector<int> out = {i};
+				Printed[(i-1)] = true;
 
+				vector<int> iData = printData(data[(i-1)]);
+				out.insert(out.end(), iData.begin(), iData.end());
 
+				sort(out.begin(), out.end());
 
-	/*
-	//output
-	for(Friends testCase: allData){
-		bool none = true;
+				for(int k: out){
+					cout << k << ' ';
+				}
+				cout << endl;
 
-		
-
-
-
-		//print none if they all have friends
-		if(none){
-			cout << "NONE";
+			}
 		}
 
-		
-		cout << endl;
+		delete[] Printed;
+		delete[] data;
+
 		cout << endl;
 	}
-	*/
 
+
+}
+
+//recursive function
+vector<int> printData(vector<int> out){
+	vector<int> returnVal;
+	for(int i: out){
+		if(!Printed[(i-1)]){
+			returnVal.push_back(i);
+			Printed[(i-1)] = true;
+			vector<int> iData = printData(data[(i-1)]);
+
+			returnVal.insert(returnVal.end(), iData.begin(), iData.end());
+		}
+	}
+
+	return returnVal;
 }
